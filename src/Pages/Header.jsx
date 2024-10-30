@@ -1,24 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Loader } from "../Services";
 
 const Header = () => {
-  const {
-    loginWithPopup,
-    loginWithRedirect,
-    logout,
-    isLoading,
-    user,
-    isAuthenticated,
-  } = useAuth0();
+  const [isOpen, setIsOpen] = useState(false);
+
+  const { loginWithRedirect, logout, isLoading, isAuthenticated } =
+    useAuth0();
 
   const Login = () => {
-    console.log("Current User", user);
     return (
       <React.Fragment>
         <button
-          className="bg-green-200 m-2 p-2 font-medium text-xl"
+          className="bg-violet-900 m-2 p-2 font-medium text-xl border rounded-md"
           onClick={() => loginWithRedirect()}
         >
           Log In
@@ -26,11 +21,12 @@ const Header = () => {
       </React.Fragment>
     );
   };
+
   const Logout = () => {
     return (
       <React.Fragment>
         <button
-          className="bg-red-700 m-2 p-2 font-medium text-xl"
+          className="bg-violet-900 m-2 p-2 font-medium text-xl border rounded-md"
           onClick={() =>
             logout({ logoutParams: { returnTo: window.location.origin } })
           }
@@ -40,35 +36,86 @@ const Header = () => {
       </React.Fragment>
     );
   };
-  const LoginWithPop = () =>{
-    alert(loginWithPopup());
-  };
 
   if (isLoading) {
     return <Loader />;
   }
   return (
-    <div className="flex justify-between items-center p-2 text-amber-600">
-      <div className="flex justify-start">
+    <header className="bg-violet-400 text-white shadow-md">
+      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+        {/* Logo or Brand */}
         <Link className="Link" to={"/"}>
-          {isAuthenticated ? user.name : <h6>Hello Guest</h6>}
+          <h6 className="font-medium text-xl">React Authentication</h6>
         </Link>
+
+        {/* Mobile Menu Icon */}
+        <div className="md:hidden">
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="text-white focus:outline-none"
+          >
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d={isOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16m-7 6h7"}
+              ></path>
+            </svg>
+          </button>
+        </div>
+
+        {/* Menu Items */}
+        <nav
+          className={`${
+            isOpen ? "block" : "hidden"
+          } md:flex space-x-6 items-center`}
+        >
+          <Link className="font-medium text-xl" to={"/"}>
+            Home
+          </Link>
+          <Link className="font-medium text-xl" to={"/UserProfile"}>
+            User
+          </Link>
+          <Link className="font-medium text-xl" to={"/About"}>
+            About
+          </Link>
+          <button>{isAuthenticated ? <Logout /> : <Login />}</button>
+        </nav>
       </div>
 
-      <div className="grid grid-flow-col grid-col-3 gap-10">
-        {/* Section for About */}
-
-        <Link className="Link" to={"/About"}>
-          About
-        </Link>
-
-        {/* Section for Login/Signup */}
-
-        <Link className="Link" to={"/Contact"}>
-          {isAuthenticated ? <Logout /> : <Login />}
-        </Link>
-      </div>
-    </div>
+      {/* Mobile Menu */}
+      {isOpen && (
+        <div className="md:hidden">
+          <nav className="px-4 pb-4">
+            <Link
+              className="block py-2 text-white hover:text-gray-300"
+              to={"/"}
+            >
+              Home
+            </Link>
+            <Link
+              className="block py-2 text-white hover:text-gray-300"
+              to={"/UserProfile"}
+            >
+              User
+            </Link>
+            <Link
+              className="block py-2 text-white hover:text-gray-300"
+              to={"/About"}
+            >
+              About
+            </Link>
+          </nav>
+        </div>
+      )}
+    </header>
   );
 };
 
